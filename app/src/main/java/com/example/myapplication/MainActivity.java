@@ -14,6 +14,7 @@ public class MainActivity extends LoggingActivity {
     private static final int REQUEST_CODE_CHEAT = 1;
 
     private static final String KEY_CURRENT_INDEX = "key_current_index";
+    private static final String KEY_SAVE_RESULT = "key_save_result";
 
     private Question[] mQuestionBank = new Question[]{
             new Question(R.string.question_australia, true),
@@ -26,7 +27,10 @@ public class MainActivity extends LoggingActivity {
 
     private int mCurrentIndex = 0;
 
-    private boolean isCheater;
+    private int[] allResult = new int[mQuestionBank.length];
+    private int oneResultCheat = 3;
+    private int oneResultTrue = 2;
+    private int oneResultFalse = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,7 @@ public class MainActivity extends LoggingActivity {
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_CURRENT_INDEX);
+            allResult = savedInstanceState.getIntArray(KEY_SAVE_RESULT);
         }
 
         final TextView questionString = findViewById(R.id.question_string);
@@ -65,8 +70,6 @@ public class MainActivity extends LoggingActivity {
 
                 final Question currentQuestion = mQuestionBank[mCurrentIndex];
                 questionString.setText(currentQuestion.getQuestionResId());
-
-                isCheater = false;
             }
         });
 
@@ -86,7 +89,7 @@ public class MainActivity extends LoggingActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE_CHEAT) {
             if (resultCode == RESULT_OK && CheatActivity.correctAnswerWasShown(data)) {
-                isCheater = true;
+                allResult[mCurrentIndex] = oneResultCheat;
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -97,13 +100,14 @@ public class MainActivity extends LoggingActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_CURRENT_INDEX, mCurrentIndex);
+        outState.putIntArray(KEY_SAVE_RESULT, allResult);
     }
 
     private void onButtonClicked(boolean answer) {
         Question currentQuestion = mQuestionBank[mCurrentIndex];
         int toastMessage;
 
-        if (isCheater) {
+        if (allResult[mCurrentIndex] == oneResultCheat) {
             toastMessage = R.string.judgment_toast;
         } else {
             toastMessage = (currentQuestion.isCorrectAnswer() == answer) ?

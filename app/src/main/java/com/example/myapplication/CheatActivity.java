@@ -11,6 +11,9 @@ public class CheatActivity extends LoggingActivity {
 
     private static final String KEY_CORRECT_ANSWER = "key_correct_answer";
     private static final String KEY_CORRECT_ANSWER_WAS_SHOWN = "key_correct_answer_was_shown";
+    private static final String KEY_SAVE_ANSWER_WAS_SHOWN = "key_save_answer_was_shown";
+
+    private boolean answerWasShown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +27,13 @@ public class CheatActivity extends LoggingActivity {
                 showCorrectAnswer();
             }
         });
+
+        if (savedInstanceState != null) {
+            answerWasShown = savedInstanceState.getBoolean(KEY_SAVE_ANSWER_WAS_SHOWN);
+            if (answerWasShown) {
+                setResult(RESULT_OK, makeAnswerShownIntent());
+            }
+        }
     }
 
     private void showCorrectAnswer() {
@@ -34,6 +44,8 @@ public class CheatActivity extends LoggingActivity {
         correctAnswerView.setText(String.valueOf(correctAnswer));
 
         setResult(RESULT_OK, makeAnswerShownIntent());
+
+        answerWasShown = true;
     }
 
     private static Intent makeAnswerShownIntent() {
@@ -51,5 +63,11 @@ public class CheatActivity extends LoggingActivity {
     public static boolean correctAnswerWasShown(Intent intent) {
         return intent != null &&
                 intent.getBooleanExtra(KEY_CORRECT_ANSWER_WAS_SHOWN, false);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_SAVE_ANSWER_WAS_SHOWN, answerWasShown);
     }
 }
