@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 public class MainActivity extends LoggingActivity {
 
     private static final int REQUEST_CODE_CHEAT = 1;
+    private static final int REQUEST_CODE_STATS = 2;
 
     private static final String KEY_CURRENT_INDEX = "key_current_index";
     private static final String KEY_SAVE_RESULT = "key_save_result";
@@ -31,6 +32,7 @@ public class MainActivity extends LoggingActivity {
     private int oneResultCheat = 3;
     private int oneResultTrue = 2;
     private int oneResultFalse = 1;
+    private int oneNotAnswered = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +85,15 @@ public class MainActivity extends LoggingActivity {
                 startActivityForResult(intent, REQUEST_CODE_CHEAT);
             }
         });
+
+        Button statsButton = findViewById(R.id.stats_button);
+        statsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = StatsActivity.makeIntentStats(MainActivity.this, allResult);
+                startActivityForResult(intent, REQUEST_CODE_STATS);
+            }
+        });
     }
 
     @Override
@@ -109,10 +120,14 @@ public class MainActivity extends LoggingActivity {
 
         if (allResult[mCurrentIndex] == oneResultCheat) {
             toastMessage = R.string.judgment_toast;
+        } else if (currentQuestion.isCorrectAnswer() == answer){
+            toastMessage = R.string.correct_toast;
+            allResult[mCurrentIndex] = oneResultTrue;
         } else {
-            toastMessage = (currentQuestion.isCorrectAnswer() == answer) ?
-                    R.string.correct_toast :
-                    R.string.incorrect_toast;
+            toastMessage = R.string.incorrect_toast;
+            if (allResult[mCurrentIndex] == oneNotAnswered) {
+                allResult[mCurrentIndex] = oneResultFalse;
+            }
         }
 
         Toast.makeText(
