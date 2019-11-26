@@ -19,4 +19,6 @@
     <string name="warning_text">Are you sure you want to do this?</string>
     <string name="show_answer_button">Show Answer</string>
     <string name="judgment_toast">Cheating is wrong.</string>
+
+    <string name="stats_button">Stats</string>
 </resources>
