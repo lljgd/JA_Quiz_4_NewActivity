@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 public class MainActivity extends LoggingActivity {
 
     private static final int REQUEST_CODE_CHEAT = 1;
-    private static final int REQUEST_CODE_STATS = 2;
 
     private static final String KEY_CURRENT_INDEX = "key_current_index";
     private static final String KEY_SAVE_RESULT = "key_save_result";
@@ -29,10 +28,14 @@ public class MainActivity extends LoggingActivity {
     private int mCurrentIndex = 0;
 
     private int[] allResult = new int[mQuestionBank.length];
-    private int oneResultCheat = 3;
-    private int oneResultTrue = 2;
-    private int oneResultFalse = 1;
-    private int oneNotAnswered = 0;
+    private static final int oneResultCheat = 3;
+    private static final int oneResultTrue = 2;
+    private static final int oneResultFalse = 1;
+    private static final int oneNotAnswered = 0;
+
+    private int sumQuestions = mQuestionBank.length;
+    private int sumAnswered;
+    private int sumTrueAnswered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,10 +93,27 @@ public class MainActivity extends LoggingActivity {
         statsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = StatsActivity.makeIntentStats(MainActivity.this, allResult);
-                startActivityForResult(intent, REQUEST_CODE_STATS);
+                countStats();
+                Intent intentStats = new Intent(MainActivity.this, StatsActivity.class);
+                intentStats.putExtra("key_all_questions", sumQuestions);
+                intentStats.putExtra("key_all_answered", sumAnswered);
+                intentStats.putExtra("key_true_answered", sumTrueAnswered);
+                startActivity(intentStats);
             }
         });
+    }
+
+    private void countStats() {
+        sumAnswered = 0;
+        sumTrueAnswered = 0;
+        for (int i = 0; i < sumQuestions; i++) {
+            if (allResult[i] != oneNotAnswered) {
+                sumAnswered++;
+                if (allResult[i] == oneResultTrue) {
+                    sumTrueAnswered++;
+                }
+            }
+        }
     }
 
     @Override
